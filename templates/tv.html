@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="tv-screen">
+<video
+    id="tv-player"
+    class="tv-player"
+    autoplay
+    playsinline
+></video>
+
+<div id="player-loading" class="player-status">
+    Stream wird geladen …
+</div>
+
+<div id="player-error" class="player-status player-error" hidden>
+    Stream konnte nicht wiedergegeben werden.
+</div>
+
+{% if tvh_error %}
+<div class="tvh-error">
+    <strong>TVHeadend nicht erreichbar</strong>
+    <span>{{ tvh_error }}</span>
+</div>
+{% endif %}
+    <div class="tv-background" aria-hidden="true"></div>
+
+    <section
+        id="channel-list"
+        class="channel-list"
+        aria-label="Senderliste"
+        data-selected-index="{{ selected_channel }}"
+    >
+        <div id="channel-list-track" class="channel-list-track">
+
+            {% for channel in channels %}
+        <button
+           type="button"
+           class="channel-row {% if loop.index0 == selected_channel %}selected{% endif %}"
+           data-channel-index="{{ loop.index0 }}"
+           data-channel-number="{{ channel.number }}"
+           data-channel-uuid="{{ channel.uuid }}"
+           data-channel-name="{{ channel.name }}"
+           data-stream-url="{{ channel.stream_url }}"
+       >
+                <span class="channel-number">
+                    {{ channel.number }}
+                </span>
+
+                <span class="channel-content">
+                    <span class="channel-name-row">
+                        {% if channel.recording %}
+                        <span class="recording-dot" aria-label="Aufnahme aktiv"></span>
+                        {% endif %}
+
+                        <span class="channel-name">
+                            {{ channel.name }}
+                        </span>
+                    </span>
+
+                    <span class="channel-program-row">
+                        <span class="channel-progress">
+                            <span
+                                class="channel-progress-value"
+                                style="width: {{ channel.progress }}%"
+                            ></span>
+                        </span>
+
+                        <span class="channel-event">
+                           {{ channel.event or "Keine Programminformation" }}
+                        </span>
+                    </span>
+                </span>
+
+                <span class="channel-logo">
+                    {% if channel.icon_public_url %}
+                    <img
+                        src="{{ channel.icon_url }}"
+                        alt="{{ channel.name }}"
+                        loading="lazy"
+                    >
+                    {% else %}
+                    <span class="channel-logo-placeholder">
+                        {{ channel.name }}
+                    </span>
+                    {% endif %}
+                </span>
+            </button>
+            {% endfor %}
+
+        </div>
+    </section>
+
+</div>
+
+{% endblock %}

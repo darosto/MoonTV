@@ -1,0 +1,15 @@
+<aside class="sidebar" aria-label="Hauptmenü">
+    {% for item in menu %}
+        <button
+            class="menu-item focusable {% if item.active %}active{% endif %}"
+            type="button"
+            data-focus-group="main"
+            data-focus-row="{{ loop.index0 }}"
+            data-focus-col="0"
+            data-action="{{ item.action | default('') }}"
+        >
+            <span class="icon" aria-hidden="true">{{ item.icon }}</span>
+            <span class="menu-label">{{ item.title }}</span>
+        </button>
+    {% endfor %}
+</aside>

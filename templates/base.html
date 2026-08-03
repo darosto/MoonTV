@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="utf-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1"
+    >
+
+    <title>MoonTV</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', path='/css/webos.css') }}"
+    >
+</head>
+
+<body>
+    {% block content %}{% endblock %}
+
+    <script src="{{ url_for('static', path='/js/clock.js') }}"></script>
+    <script
+       type="module"
+       src="{{ url_for('static', path='/js/main.js') }}"
+     ></script>
+</body>
+</html>

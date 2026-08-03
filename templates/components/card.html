@@ -1,0 +1,14 @@
+<article
+    class="card focusable"
+    tabindex="0"
+    data-focus-group="main"
+    data-focus-row="{{ row }}"
+    data-focus-col="{{ col }}"
+    data-action="{{ action | default('') }}"
+>
+    <div class="card-title">{{ title }}</div>
+
+    {% if description %}
+        <div class="card-description">{{ description }}</div>
+    {% endif %}
+</article>

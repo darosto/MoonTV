@@ -1,0 +1,538 @@
+:root {
+    --background: #171717;
+    --surface: #242424;
+    --surface-active: #3c3c3c;
+    --surface-focus: #f1f1f1;
+    --text: #f4f4f4;
+    --text-dark: #161616;
+    --text-muted: #a7a7a7;
+    --radius-large: 22px;
+    --focus-scale: 1.055;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    width: 100%;
+    min-height: 100%;
+    margin: 0;
+}
+
+body {
+    overflow: hidden;
+    background:
+        radial-gradient(
+            circle at 70% 10%,
+            rgba(255, 255, 255, 0.08),
+            transparent 35%
+        ),
+        var(--background);
+
+    color: var(--text);
+    font-family: "Noto Sans", "Segoe UI", sans-serif;
+}
+
+button {
+    font: inherit;
+}
+
+.layout{
+
+    display:flex;
+    width: 100vw;
+    height:100vh;
+
+}
+
+.sidebar {
+    display: flex;
+    flex: 0 0 290px;
+    flex-direction: column;
+    gap: 12px;
+
+    padding: 42px 28px;
+
+    background: rgba(20, 20, 20, 0.88);
+    backdrop-filter: blur(24px);
+}
+
+.menu-item {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+
+    width: 100%;
+    min-height: 72px;
+    padding: 0 22px;
+
+    border: 0;
+    border-radius: var(--radius-large);
+
+    background: transparent;
+    color: var(--text);
+
+    text-align: left;
+    cursor: pointer;
+
+    transition:
+        transform 160ms ease,
+        background-color 160ms ease,
+        color 160ms ease,
+        box-shadow 160ms ease;
+}
+
+.menu-item.active {
+    background: var(--surface-active);
+}
+
+.menu-item .icon {
+    width: 40px;
+    font-size: 27px;
+    text-align: center;
+}
+
+.menu-item:hover{
+
+    background:#3d3d3d;
+
+}
+
+.menu-label {
+    font-size: 22px;
+    font-weight: 500;
+}
+
+.active{
+
+    background:#505050;
+
+}
+
+main{
+
+    flex:1;
+
+    padding:40px;
+
+}
+
+.content {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-width: 0;
+    padding: 36px 48px 48px;
+}
+
+.topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    min-height: 70px;
+    margin-bottom: 30px;
+}
+
+.logo {
+    font-size: 31px;
+    font-weight: 600;
+}
+
+#clock {
+    font-size: 27px;
+    font-weight: 400;
+}
+
+.dashboard {
+    flex: 1;
+    min-height: 0;
+}
+
+.cards {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(280px, 1fr));
+    gap: 28px;
+
+    max-width: 1100px;
+}
+
+.card {
+    min-height: 220px;
+    padding: 30px;
+
+    border-radius: var(--radius-large);
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255, 255, 255, 0.08),
+            rgba(255, 255, 255, 0.015)
+        ),
+        var(--surface);
+
+    cursor: pointer;
+
+    transition:
+        transform 160ms ease,
+        background-color 160ms ease,
+        color 160ms ease,
+        box-shadow 160ms ease;
+}
+
+.card-title {
+    font-size: 30px;
+    font-weight: 600;
+}
+
+.card-description {
+    margin-top: 12px;
+    color: var(--text-muted);
+    font-size: 18px;
+}
+
+.focusable {
+    outline: none;
+}
+
+.focusable.focused {
+    position: relative;
+    z-index: 10;
+
+    transform: scale(var(--focus-scale));
+
+    background: var(--surface-focus);
+    color: var(--text-dark);
+
+    box-shadow:
+        0 18px 42px rgba(0, 0, 0, 0.42),
+        0 0 0 4px rgba(255, 255, 255, 0.18);
+}
+
+.focusable.focused .card-description {
+    color: #4b4b4b;
+}
+
+@media (max-width: 900px) {
+    .sidebar {
+        flex-basis: 230px;
+    }
+
+    .cards {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* =========================================================
+   Originalgetreue TV- und Senderlistenansicht
+   ========================================================= */
+
+.tv-screen {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    background: #000;
+}
+
+.tv-background {
+    position: absolute;
+    inset: 0;
+
+/*    background:
+        linear-gradient(
+            rgba(0, 0, 0, 0.08),
+            rgba(0, 0, 0, 0.08)
+        ),
+        url("/static/img/background.png") center center / cover no-repeat;
+*/
+    background: none;
+    z-index: 1;
+}
+
+.channel-list {
+    position: absolute;
+    inset: 0 auto 0 0;
+    z-index: 8;
+
+    width: 900px;
+    max-width: 47vw;
+    height: 100vh;
+
+    overflow: hidden;
+
+    background:
+        linear-gradient(
+            to bottom,
+            rgba(11, 39, 58, 0.72) 0%,
+            rgba(35, 64, 84, 0.91) 20%,
+            rgba(35, 64, 84, 0.91) 80%,
+            rgba(11, 39, 58, 0.72) 100%
+        );
+}
+
+.channel-list-track {
+    width: 100%;
+    height: auto;
+    overflow: visible;
+    will-change: transform;
+}
+
+.channel-list-track::-webkit-scrollbar {
+    display: none;
+}
+
+.channel-row {
+    display: grid;
+    flex-shrink: 0;
+    grid-template-columns: 90px minmax(0, 1fr) 145px;
+    align-items: center;
+
+    width: 100%;
+    height: 90px;
+    padding: 0 10px 0 0;
+
+    border: 0;
+    border-radius: 0;
+
+    background: transparent;
+    color: #cccccc;
+
+    text-align: left;
+    cursor: pointer;
+
+    transition: background-color 100ms linear;
+}
+
+.channel-row:focus {
+    outline: none;
+}
+
+.channel-row.selected {
+    background: rgba(29, 170, 226, 1);
+}
+
+.channel-number {
+    padding-right: 20px;
+
+    color: #cccccc;
+
+    font-size: 38px;
+    font-weight: 700;
+    line-height: 1;
+    text-align: right;
+}
+
+.channel-content {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.channel-name-row {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+}
+
+.channel-name {
+    overflow: hidden;
+
+    color: #cccccc;
+
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 1.08;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.channel-program-row {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+    margin-top: 6px;
+}
+
+.channel-progress {
+    position: relative;
+    flex: 0 0 80px;
+    height: 13px;
+    margin-right: 7px;
+
+    border: 1px solid #cccccc;
+    background: transparent;
+}
+
+.channel-progress-value {
+    position: absolute;
+    inset: 2px auto 2px 2px;
+
+    max-width: calc(100% - 4px);
+
+    background: #969696;
+}
+
+.channel-row.selected .channel-progress-value {
+    background: #cccccc;
+}
+
+.channel-event {
+    min-width: 0;
+    overflow: hidden;
+
+    color: #969696;
+
+    font-size: 26px;
+    font-weight: 400;
+    line-height: 1;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.channel-row.selected .channel-event {
+    color: #cccccc;
+}
+
+.recording-dot {
+    flex: 0 0 auto;
+
+    width: 20px;
+    height: 20px;
+    margin-right: 7px;
+
+    border-radius: 50%;
+    background: #ff0000;
+}
+
+.channel-logo {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+
+    width: 100%;
+    height: 80px;
+    overflow: hidden;
+}
+
+.channel-logo img {
+    display: block;
+
+    max-width: 130px;
+    max-height: 78px;
+
+    object-fit: contain;
+}
+
+.channel-logo-placeholder {
+    display: block;
+    max-width: 130px;
+    overflow: hidden;
+
+    color: rgba(255, 255, 255, 0.72);
+
+    font-size: 16px;
+    font-weight: 700;
+    text-align: right;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+@media (max-width: 1200px) {
+    .channel-list {
+        width: 47vw;
+        max-width: none;
+    }
+
+    .channel-row {
+        grid-template-columns: 72px minmax(0, 1fr) 105px;
+    }
+
+    .channel-number {
+        font-size: 30px;
+    }
+
+    .channel-name {
+        font-size: 26px;
+    }
+
+    .channel-event {
+        font-size: 21px;
+    }
+
+    .channel-logo img {
+        max-width: 95px;
+    }
+}
+
+.tvh-error {
+    position: absolute;
+    top: 40px;
+    left: 50%;
+    z-index: 50;
+
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    min-width: 420px;
+    padding: 20px 26px;
+
+    transform: translateX(-50%);
+
+    background: rgba(5, 16, 24, 0.95);
+    color: #fff;
+    font-size: 18px;
+}
+
+.tv-player {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+
+    width: 100%;
+    height: 100%;
+
+    background: #000;
+    object-fit: contain;
+}
+
+.tv-background {
+    pointer-events: none;
+}
+
+.player-status {
+    position: absolute;
+    top: 50%;
+    left: 72%;
+    z-index: 5;
+
+    transform: translate(-50%, -50%);
+
+    padding: 16px 22px;
+
+    background: rgba(5, 16, 24, 0.9);
+    color: #fff;
+    font-size: 20px;
+}
+
+.player-error {
+    color: #ffb8b8;
+}
+
+.player-status[hidden] {
+    display: none;
+}
+.channel-list {
+    transition:
+        transform 0.35s ease,
+        opacity 0.35s ease;
+}
+
+.channel-list.hidden {
+    transform: translateX(-100%);
+    opacity: 0;
+}

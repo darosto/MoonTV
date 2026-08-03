@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="layout">
+
+    {% include "components/sidebar.html" %}
+
+    <div class="content">
+        {% include "components/topbar.html" %}
+
+        <main class="dashboard">
+            <div class="cards">
+
+                {% set title = "Live TV" %}
+                {% set description = "Sender ansehen" %}
+                {% set row = 0 %}
+                {% set col = 1 %}
+                {% set action = "/tv" %}
+                {% include "components/card.html" %}
+
+                {% set title = "Recordings" %}
+                {% set description = "Aufnahmen verwalten" %}
+                {% set row = 0 %}
+                {% set col = 2 %}
+                {% set action = "/recordings" %}
+                {% include "components/card.html" %}
+
+                {% set title = "TV Guide" %}
+                {% set description = "Programmübersicht" %}
+                {% set row = 1 %}
+                {% set col = 1 %}
+                {% set action = "/guide" %}
+                {% include "components/card.html" %}
+
+                {% set title = "Settings" %}
+                {% set description = "TVHeadend konfigurieren" %}
+                {% set row = 1 %}
+                {% set col = 2 %}
+                {% set action = "/settings" %}
+                {% include "components/card.html" %}
+
+            </div>
+        </main>
+    </div>
+</div>
+{% endblock %}

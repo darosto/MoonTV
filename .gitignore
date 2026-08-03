@@ -1,0 +1,22 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# IDE
+.vscode/
+.idea/
+
+# Environment
+.env
+data/
+
+# Logs
+*.log
+
+# Build
+dist/
+build/
+
+# Linux
+*.swp
