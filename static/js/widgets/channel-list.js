@@ -18,6 +18,7 @@ export class ChannelList extends Widget {
         this.handleKeyDown = this.handleKeyDown.bind(this);
         this.handleWheel = this.handleWheel.bind(this);
         this.handleClick = this.handleClick.bind(this);
+        this.handleDoubleClick = this.handleDoubleClick.bind(this);
     }
 
     initialize() {
@@ -69,16 +70,20 @@ export class ChannelList extends Widget {
         );
         this.unsubscribers.push(
             eventBus.on(
-            Events.CHANNEL_LIST_SHOW,
-            () => this.show()
-          )
+                Events.CHANNEL_LIST_SHOW,
+                () => this.show()
+            )
         );
 
         this.unsubscribers.push(
             eventBus.on(
-            Events.CHANNEL_LIST_HIDE,
-            () => this.hide()
-          )
+                Events.CHANNEL_LIST_HIDE,
+                () => this.hide()
+            )
+        );
+        this.root.addEventListener(
+            "dblclick",
+            this.handleDoubleClick
         );
     }
 
@@ -93,7 +98,10 @@ export class ChannelList extends Widget {
         for (const unsubscribe of this.unsubscribers) {
             unsubscribe();
         }
-
+        this.root.removeEventListener(
+            "dblclick",
+            this.handleDoubleClick
+        );
         this.unsubscribers = [];
     }
 
@@ -247,11 +255,9 @@ export class ChannelList extends Widget {
                 event.preventDefault();
                 event.stopPropagation();
 
-                this.root.dispatchEvent(
-                    new CustomEvent("channeldetailsopen", {
-                        bubbles: true,
-                        detail: this.getSelectedChannel(),
-                    })
+                eventBus.emit(
+                    Events.CHANNEL_DETAILS_OPEN,
+                    this.getSelectedChannel()
                 );
                 break;
         }
@@ -280,12 +286,45 @@ export class ChannelList extends Widget {
             return;
         }
 
-        if (index === this.selectedIndex) {
-            this.activateSelected();
+        /*
+         * Erster Klick:
+         * Sender markieren und Detaildaten aktualisieren.
+         */
+        if (index !== this.selectedIndex) {
+            this.select(index, {
+                animate: true,
+                focus: true,
+            });
+
             return;
         }
 
-        this.select(index);
+        /*
+         * Zweiter Klick auf den bereits markierten Sender:
+         * Sender starten.
+         */
+        this.activateSelected();
+    }
+
+    handleDoubleClick(event) {
+        const row = event.target.closest(".channel-row");
+
+        if (!row || !this.root.contains(row)) {
+            return;
+        }
+
+        const index = this.rows.indexOf(row);
+
+        if (index === -1) {
+            return;
+        }
+
+        this.select(index, {
+            animate: false,
+            focus: true,
+        });
+
+        this.activateSelected();
     }
 
     isValidIndex(index) {
@@ -295,55 +334,62 @@ export class ChannelList extends Widget {
             index < this.rows.length
         );
     }
-show() {
-    if (!this.root) {
-        return;
+
+    show() {
+        if (!this.root) {
+            return;
+        }
+
+        this.root.inert = false;
+        this.root.classList.remove("hidden");
+
+        const selectedRow = this.getSelectedRow();
+
+        if (selectedRow) {
+            selectedRow.focus({
+                preventScroll: true,
+            });
+        }
     }
 
-    this.root.classList.remove("hidden");
-    this.root.setAttribute("aria-hidden", "false");
+    hide() {
+        if (!this.root) {
+            return;
+        }
 
-    const selectedRow = this.getSelectedRow();
+        const selectedRow = this.getSelectedRow();
 
-    if (selectedRow) {
-        selectedRow.focus({
-            preventScroll: true,
-        });
-    }
-}
+        if (selectedRow) {
+            selectedRow.blur();
+        }
 
-hide() {
-    if (!this.root) {
-        return;
+        this.root.classList.add("hidden");
+        this.root.inert = true;
     }
 
-    this.root.classList.add("hidden");
-    this.root.setAttribute("aria-hidden", "true");
-}
-
-isVisible() {
-    return Boolean(
-        this.root &&
-        !this.root.classList.contains("hidden")
-    );
-}
+    isVisible() {
+        return Boolean(
+            this.root &&
+            !this.root.classList.contains("hidden")
+        );
+    }
 
 
     activateSelected() {
-       const channel = this.getSelectedChannel();
+        const channel = this.getSelectedChannel();
 
-       if (!channel) {
-          return;
-       }
+        if (!channel) {
+            return;
+        }
 
-       eventBus.emit(
-          Events.CHANNEL_ACTIVATE,
-          channel
-       );
+        eventBus.emit(
+            Events.CHANNEL_ACTIVATE,
+            channel
+        );
 
-       setTimeout(() => {
-          eventBus.emit(Events.CHANNEL_LIST_HIDE);
-       }, 1200);
+        setTimeout(() => {
+            eventBus.emit(Events.CHANNEL_LIST_HIDE);
+        }, 1200);
 
     }
 }

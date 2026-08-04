@@ -4,7 +4,7 @@ import httpx
 from dotenv import load_dotenv
 from collections.abc import AsyncIterator
 from fastapi import APIRouter, HTTPException, Request
-from fastapi.responses import HTMLResponse, Response, StreamingResponse
+from fastapi.responses import HTMLResponse, JSONResponse, Response, StreamingResponse
 from fastapi.templating import Jinja2Templates
 
 
@@ -146,4 +146,35 @@ async def tvh_stream(channel_uuid: str):
             "Cache-Control": "no-store",
             "X-Accel-Buffering": "no",
         },
+    )
+
+@router.get("/api/tv/channels/{channel_uuid}/events")
+async def channel_events(channel_uuid: str):
+    if not channel_uuid or not channel_uuid.isalnum():
+        raise HTTPException(
+            status_code=400,
+            detail="Ungültige Sender-UUID",
+        )
+
+    try:
+        events = await channel_service.get_channel_events(
+            channel_uuid=channel_uuid,
+            limit=6,
+        )
+    except httpx.RequestError as error:
+        raise HTTPException(
+            status_code=502,
+            detail="TVHeadend ist nicht erreichbar.",
+        ) from error
+    except RuntimeError as error:
+        raise HTTPException(
+            status_code=502,
+            detail=str(error),
+        ) from error
+
+    return JSONResponse(
+        {
+            "channel_uuid": channel_uuid,
+            "events": [event.to_dict() for event in events],
+        }
     )

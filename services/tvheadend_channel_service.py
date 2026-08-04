@@ -6,7 +6,7 @@ from typing import Any
 
 import httpx
 from dotenv import load_dotenv
-
+from models.epg_event import EPGEvent
 from models.channel import Channel
 
 
@@ -165,3 +165,61 @@ class TVHeadendChannelService:
                 )
 
             raise RuntimeError(message) from error
+
+    async def get_channel_events(
+        self,
+        channel_uuid: str,
+        limit: int = 6,
+    ) -> list[EPGEvent]:
+        now = int(time.time())
+
+        async with httpx.AsyncClient(
+            base_url=self.base_url,
+            auth=(self.username, self.password),
+            timeout=self.timeout,
+        ) as client:
+            response = await client.get(
+                "/api/epg/events/grid",
+                params={
+                    "channel": channel_uuid,
+                    "start": 0,
+                    "limit": max(limit * 4, 24),
+                    "sort": "start",
+                    "dir": "ASC",
+                },
+            )
+
+            self._raise_for_status(response)
+
+        entries = response.json().get("entries", [])
+
+        events: list[EPGEvent] = []
+
+        for entry in entries:
+            start = self._optional_int(entry.get("start"))
+            stop = self._optional_int(entry.get("stop"))
+
+            if start is None or stop is None:
+                continue
+
+            # Vergangene Sendungen nicht anzeigen.
+            if stop <= now:
+                continue
+
+            events.append(
+                EPGEvent(
+                    event_id=self._to_int(entry.get("eventId")),
+                    channel_uuid=str(entry.get("channelUuid", "")),
+                    title=str(entry.get("title", "Keine Information")),
+                    subtitle=str(entry.get("subtitle", "")),
+                    description=str(entry.get("description", "")),
+                    start=start,
+                    stop=stop,
+                    recording=bool(entry.get("dvrState")),
+                )
+            )
+
+            if len(events) >= limit:
+                break
+
+        return events

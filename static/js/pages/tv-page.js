@@ -3,7 +3,7 @@ import { eventBus } from "../core/event-bus.js";
 import { Events } from "../core/events.js";
 import { ChannelList } from "../widgets/channel-list.js";
 import { Player } from "../widgets/player.js";
-
+import { ChannelInfo } from "../widgets/channel-info.js";
 
 export class TVPage extends Page {
     constructor() {
@@ -11,6 +11,7 @@ export class TVPage extends Page {
 
         this.channelList = null;
         this.player = null;
+        this.channelInfo = null;
         this.unsubscribers = [];
         this.handleKeyDown = this.handleKeyDown.bind(this);
         this.handleChannelChange =
@@ -69,6 +70,9 @@ initialize() {
 
     this.player = new Player("#tv-player");
     this.player.initialize();
+
+    this.channelInfo = new ChannelInfo("#channel-info");
+    this.channelInfo.initialize();
 }
 
 handleKeyDown(event) {
@@ -79,6 +83,27 @@ handleKeyDown(event) {
     event.preventDefault();
     event.stopPropagation();
 
+    const infoPanel = document.querySelector("#channel-info");
+    const channelList = document.querySelector("#channel-list");
+
+    const infoVisible =
+        infoPanel &&
+        !infoPanel.classList.contains("hidden");
+
+    const channelListVisible =
+        channelList &&
+        !channelList.classList.contains("hidden");
+
+    if (infoVisible) {
+        eventBus.emit(Events.CHANNEL_DETAILS_CLOSE);
+        return;
+    }
+
+    if (channelListVisible) {
+        eventBus.emit(Events.CHANNEL_LIST_HIDE);
+        return;
+    }
+
     eventBus.emit(Events.CHANNEL_LIST_SHOW);
 }
 
@@ -88,8 +113,10 @@ destroy() {
     }
 
     this.unsubscribers = [];
+    this.channelInfo?.destroy();
     this.player?.destroy();
     this.channelList?.destroy();
+    
     document.removeEventListener(
        "keydown",
       this.handleKeyDown

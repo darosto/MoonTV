@@ -29,6 +29,7 @@
         id="channel-list"
         class="channel-list"
         aria-label="Senderliste"
+        aria-hidden="false"
         data-selected-index="{{ selected_channel }}"
     >
         <div id="channel-list-track" class="channel-list-track">
@@ -90,7 +91,43 @@
 
         </div>
     </section>
+<aside
+    id="channel-info"
+    class="channel-info-panel hidden"
+    aria-hidden="true"
+>
+    <div class="channel-info-header">
+        <div id="channel-info-timeframe" class="channel-info-timeframe">
+            --:-- – --:--
+        </div>
 
+        <div id="channel-info-clock" class="channel-info-clock">
+            --:--
+        </div>
+    </div>
+
+    <div id="channel-info-title" class="channel-info-title">
+        Keine Information
+    </div>
+
+    <div id="channel-info-subtitle" class="channel-info-subtitle"></div>
+
+    <div id="channel-info-description" class="channel-info-description"></div>
+
+    <div class="channel-info-next">
+        <div class="channel-info-separator"></div>
+
+        <ul id="channel-info-event-list" class="channel-info-event-list"></ul>
+    </div>
+
+    <div
+        id="channel-info-error"
+        class="channel-info-error"
+        hidden
+    >
+        Programminformationen konnten nicht geladen werden.
+    </div>
+</aside>
 </div>
 
 {% endblock %}
