@@ -2,48 +2,40 @@
 
 {% block content %}
 <div class="tv-screen">
-<video
-    id="tv-player"
-    class="tv-player"
-    autoplay
-    playsinline
-></video>
+    <video id="tv-player" class="tv-player" autoplay playsinline></video>
 
-<div id="player-loading" class="player-status">
-    Stream wird geladen …
-</div>
+    <div id="player-loading" class="player-status">
+        Stream wird geladen …
+    </div>
 
-<div id="player-error" class="player-status player-error" hidden>
-    Stream konnte nicht wiedergegeben werden.
-</div>
+    <div id="player-error" class="player-status player-error" hidden>
+        Stream konnte nicht wiedergegeben werden.
+    </div>
 
-{% if tvh_error %}
-<div class="tvh-error">
-    <strong>TVHeadend nicht erreichbar</strong>
-    <span>{{ tvh_error }}</span>
-</div>
-{% endif %}
+    {% if tvh_error %}
+    <div class="tvh-error">
+        <strong>TVHeadend nicht erreichbar</strong>
+        <span>{{ tvh_error }}</span>
+    </div>
+    {% endif %}
     <div class="tv-background" aria-hidden="true"></div>
 
-    <section
-        id="channel-list"
-        class="channel-list"
-        aria-label="Senderliste"
-        aria-hidden="false"
-        data-selected-index="{{ selected_channel }}"
-    >
+    <section id="channel-list" class="channel-list" aria-label="Senderliste" aria-hidden="false"
+        data-selected-index="{{ selected_channel }}">
         <div id="channel-list-track" class="channel-list-track">
 
             {% for channel in channels %}
-        <button
-           type="button"
-           class="channel-row {% if loop.index0 == selected_channel %}selected{% endif %}"
-           data-channel-index="{{ loop.index0 }}"
-           data-channel-number="{{ channel.number }}"
-           data-channel-uuid="{{ channel.uuid }}"
-           data-channel-name="{{ channel.name }}"
-           data-stream-url="{{ channel.stream_url }}"
-       >
+            <button type="button" class="channel-row {% if loop.index0 == selected_channel %}selected{% endif %}"
+                data-channel-index="{{ loop.index0 }}"
+                data-channel-number="{{ channel.number }}"
+                data-channel-logo="{{ channel.icon_url }}"
+                data-channel-uuid="{{ channel.uuid }}"
+                data-channel-name="{{ channel.name }}"
+                data-stream-url="{{ channel.stream_url }}"
+                data-channel-event="{{ channel.event }}"
+                data-channel-start="{{ channel.start or 0 }}"
+                data-channel-stop="{{ channel.stop or 0 }}"
+                data-channel-progress="{{ channel.progress }}">
                 <span class="channel-number">
                     {{ channel.number }}
                 </span>
@@ -61,25 +53,18 @@
 
                     <span class="channel-program-row">
                         <span class="channel-progress">
-                            <span
-                                class="channel-progress-value"
-                                style="width: {{ channel.progress }}%"
-                            ></span>
+                            <span class="channel-progress-value" style="width: {{ channel.progress }}%"></span>
                         </span>
 
                         <span class="channel-event">
-                           {{ channel.event or "Keine Programminformation" }}
+                            {{ channel.event or "Keine Programminformation" }}
                         </span>
                     </span>
                 </span>
 
                 <span class="channel-logo">
                     {% if channel.icon_public_url %}
-                    <img
-                        src="{{ channel.icon_url }}"
-                        alt="{{ channel.name }}"
-                        loading="lazy"
-                    >
+                    <img src="{{ channel.icon_url }}" alt="{{ channel.name }}" loading="lazy">
                     {% else %}
                     <span class="channel-logo-placeholder">
                         {{ channel.name }}
@@ -91,43 +76,68 @@
 
         </div>
     </section>
-<aside
-    id="channel-info"
-    class="channel-info-panel hidden"
-    aria-hidden="true"
->
-    <div class="channel-info-header">
-        <div id="channel-info-timeframe" class="channel-info-timeframe">
-            --:-- – --:--
+<div id="osd" class="tv-osd theme-minimal hidden">
+
+    <div class="osd-header">
+
+        <div class="osd-channel-line">
+            <span id="osd-channel-number" class="osd-channel-number"></span>
+
+            <span class="osd-separator">│</span>
+
+            <span id="osd-channel-name" class="osd-channel-name"></span>
         </div>
 
-        <div id="channel-info-clock" class="channel-info-clock">
-            --:--
+        <img
+            id="osd-channel-logo"
+            class="osd-channel-logo"
+            alt=""
+            hidden
+        >
+
+    </div>
+
+    <div id="osd-title" class="osd-title"></div>
+
+    <div class="osd-progress">
+        <div id="osd-progress-fill" class="osd-progress-fill"></div>
+    </div>
+
+    <div class="osd-times">
+        <span id="osd-start"></span>
+        <span id="osd-stop"></span>
+    </div>
+
+</div>
+    <aside id="channel-info" class="channel-info-panel hidden" aria-hidden="true">
+        <div class="channel-info-header">
+            <div id="channel-info-timeframe" class="channel-info-timeframe">
+                --:-- – --:--
+            </div>
+
+            <div id="channel-info-clock" class="channel-info-clock">
+                --:--
+            </div>
         </div>
-    </div>
 
-    <div id="channel-info-title" class="channel-info-title">
-        Keine Information
-    </div>
+        <div id="channel-info-title" class="channel-info-title">
+            Keine Information
+        </div>
 
-    <div id="channel-info-subtitle" class="channel-info-subtitle"></div>
+        <div id="channel-info-subtitle" class="channel-info-subtitle"></div>
 
-    <div id="channel-info-description" class="channel-info-description"></div>
+        <div id="channel-info-description" class="channel-info-description"></div>
 
-    <div class="channel-info-next">
-        <div class="channel-info-separator"></div>
+        <div class="channel-info-next">
+            <div class="channel-info-separator"></div>
 
-        <ul id="channel-info-event-list" class="channel-info-event-list"></ul>
-    </div>
+            <ul id="channel-info-event-list" class="channel-info-event-list"></ul>
+        </div>
 
-    <div
-        id="channel-info-error"
-        class="channel-info-error"
-        hidden
-    >
-        Programminformationen konnten nicht geladen werden.
-    </div>
-</aside>
+        <div id="channel-info-error" class="channel-info-error" hidden>
+            Programminformationen konnten nicht geladen werden.
+        </div>
+    </aside>
 </div>
 
 {% endblock %}

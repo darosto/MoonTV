@@ -11,4 +11,7 @@ export const Events = Object.freeze({
 
     CHANNEL_INFO_SHOW: "channel-info.show",
     CHANNEL_INFO_HIDE: "channel-info.hide",
+
+    OSD_SHOW:"osd.show",
+    OSD_HIDE:"osd.hide",
 });

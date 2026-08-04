@@ -4,6 +4,7 @@ import { Events } from "../core/events.js";
 import { ChannelList } from "../widgets/channel-list.js";
 import { Player } from "../widgets/player.js";
 import { ChannelInfo } from "../widgets/channel-info.js";
+import { OSD } from "../widgets/osd.js";
 
 export class TVPage extends Page {
     constructor() {
@@ -12,6 +13,7 @@ export class TVPage extends Page {
         this.channelList = null;
         this.player = null;
         this.channelInfo = null;
+        this.currentChannel = null;
         this.unsubscribers = [];
         this.handleKeyDown = this.handleKeyDown.bind(this);
         this.handleChannelChange =
@@ -71,11 +73,30 @@ initialize() {
     this.player = new Player("#tv-player");
     this.player.initialize();
 
+    this.osd = new OSD("#osd");
+    this.osd.initialize();
+
     this.channelInfo = new ChannelInfo("#channel-info");
     this.channelInfo.initialize();
+
+
 }
 
 handleKeyDown(event) {
+    if (event.key === "ArrowUp") {
+        event.preventDefault();
+        event.stopPropagation();
+
+        if (this.currentChannel) {
+            eventBus.emit(Events.OSD_SHOW, {
+                channel: this.currentChannel,
+                duration: 8000,
+            });
+        }
+
+        return;
+    }
+
     if (event.key !== "ArrowLeft") {
         return;
     }
@@ -116,7 +137,7 @@ destroy() {
     this.channelInfo?.destroy();
     this.player?.destroy();
     this.channelList?.destroy();
-    
+    this.osd?.destroy();
     document.removeEventListener(
        "keydown",
       this.handleKeyDown
@@ -129,6 +150,7 @@ destroy() {
     }
 
     handleChannelActivate(channel) {
+        this.currentChannel = channel;
         console.log("Sender ausgewählt:", channel);
     }
 

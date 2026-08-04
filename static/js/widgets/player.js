@@ -31,32 +31,26 @@ export class Player extends Widget {
         this.video.addEventListener("waiting", this.handleWaiting);
         this.video.addEventListener("loadstart", this.handleWaiting);
         this.video.addEventListener("error", this.handleError);
-
+        
+        console.log("Player initialisiert");
         this.unsubscribe = eventBus.on(
             Events.CHANNEL_ACTIVATE,
             (channel) => this.playChannel(channel)
         );
     }
 
-    destroy() {
-        this.unsubscribe?.();
-
-        if (!this.video) {
-            return;
-        }
-
-        this.video.removeEventListener("playing", this.handlePlaying);
-        this.video.removeEventListener("waiting", this.handleWaiting);
-        this.video.removeEventListener("loadstart", this.handleWaiting);
-        this.video.removeEventListener("error", this.handleError);
-
-        this.stop();
-    }
-
     async playChannel(channel) {
+        console.log("Player empfängt CHANNEL_ACTIVATE:", channel);
         if (!this.video || !channel?.streamUrl) {
+            console.warn("Player: Video oder Stream-URL fehlt.", channel);
             return;
         }
+    
+        eventBus.emit(
+            Events.OSD_SHOW, {
+            channel,
+            duration: 5000,
+      });
 
         this.showLoading();
         this.hideError();
@@ -73,6 +67,21 @@ export class Player extends Widget {
             console.error("Player konnte nicht gestartet werden:", error);
             this.showError();
         }
+    }
+
+    destroy() {
+        this.unsubscribe?.();
+
+        if (!this.video) {
+            return;
+        }
+
+        this.video.removeEventListener("playing", this.handlePlaying);
+        this.video.removeEventListener("waiting", this.handleWaiting);
+        this.video.removeEventListener("loadstart", this.handleWaiting);
+        this.video.removeEventListener("error", this.handleError);
+
+        this.stop();
     }
 
     stop() {

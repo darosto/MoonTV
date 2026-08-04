@@ -146,11 +146,16 @@ export class ChannelList extends Widget {
         }
 
         return {
-            index: this.selectedIndex,
-            number: Number(row.dataset.channelNumber),
-            uuid: row.dataset.channelUuid ?? "",
-            name: row.dataset.channelName ?? "",
-            streamUrl: row.dataset.streamUrl ?? "",
+        index: this.selectedIndex,
+        number: Number(row.dataset.channelNumber),
+        uuid: row.dataset.channelUuid ?? "",
+        name: row.dataset.channelName ?? "",
+        logo: row.dataset.channelLogo ?? "",
+        streamUrl: row.dataset.streamUrl ?? "",
+        event: row.dataset.channelEvent ?? "",
+        start: Number(row.dataset.channelStart || 0),
+        stop: Number(row.dataset.channelStop || 0),
+        progress: Number(row.dataset.channelProgress || 0),
         };
     }
 
@@ -381,7 +386,7 @@ export class ChannelList extends Widget {
         if (!channel) {
             return;
         }
-
+        console.log("ChannelList sendet CHANNEL_ACTIVATE:", channel);
         eventBus.emit(
             Events.CHANNEL_ACTIVATE,
             channel
