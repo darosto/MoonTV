@@ -43,7 +43,7 @@ Coming soon
 
 ```bash
 git clone ...
-cd moontv
+cd tvh-quick-gui
 
 python -m venv .venv
 source .venv/bin/activate
@@ -108,7 +108,7 @@ PROJECT_STRUCTURE.md
 
 ## Acknowledgements
 
-MoonTV is developed by ixbuluk.
+tvh-quick-gui is developed by ixbuluk.
 
 Architecture discussions, code reviews, debugging assistance,
 and implementation support were created in collaboration
