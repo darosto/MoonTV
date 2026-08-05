@@ -9,10 +9,6 @@ Modern TVHeadend frontend inspired by webOS<br>
 built with FastAPI.
 </p># MoonTV
 
-# 🌕 TV
-
-> Modern TVHeadend frontend inspired by webOS, built with FastAPI.
-
 ---
 
 ## Features
