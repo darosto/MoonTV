@@ -11,12 +11,23 @@ service = TVHeadendEPGService()
 router = APIRouter()
 templates = Jinja2Templates(directory="templates")
 
-PIXELS_PER_MINUTE = 5
+PIXELS_PER_MINUTE = 8
 GUIDE_HOURS = 3
 
-def event_width(start: int, stop: int) -> int:
-    minutes = max(1, (stop - start) / 60)
-    return int(minutes * PIXELS_PER_MINUTE)
+def event_width(
+    start: int,
+    stop: int,
+    guide_start: int,
+    guide_stop: int,
+) -> int:
+    visible_start = max(start, guide_start)
+    visible_stop = min(stop, guide_stop)
+
+    if visible_stop <= visible_start:
+        return 0
+
+    minutes = (visible_stop - visible_start) / 60
+    return max(1, int(minutes * PIXELS_PER_MINUTE))
 
 def floor_to_half_hour(value: datetime) -> datetime:
     minute = 0 if value.minute < 30 else 30
@@ -61,10 +72,12 @@ async def guide(request: Request):
     now = datetime.now()
     guide_start = floor_to_half_hour(now)
     guide_stop = guide_start + timedelta(hours=GUIDE_HOURS)
+    guide_start_timestamp = int(guide_start.timestamp())
+    guide_stop_timestamp = int(guide_stop.timestamp())
 
     events = await service.get_epg(
-        int(guide_start.timestamp()),
-        int(guide_stop.timestamp()),
+        guide_start_timestamp,
+        guide_stop_timestamp,
     )
 
     channels = {}
@@ -100,6 +113,8 @@ async def guide(request: Request):
                 "width": event_width(
                     event.start,
                     event.stop,
+                    guide_start_timestamp,
+                    guide_stop_timestamp,
                 ),
             }
         )
@@ -138,6 +153,9 @@ async def guide(request: Request):
             "now_label": now.strftime("%H:%M"),
             "guide_start": int(
                 guide_start.timestamp()
+            ),
+            "guide_stop": int(
+                guide_stop.timestamp()
             ),
         },
     )

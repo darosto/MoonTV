@@ -971,6 +971,7 @@ main{
 .guide-channels {
     background: rgba(11, 39, 58, 0.92);
     min-height: 0;
+    overflow: hidden;
 }
 
 .guide-channel,

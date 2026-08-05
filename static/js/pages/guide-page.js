@@ -19,6 +19,21 @@ export class GuidePage extends Page {
             return;
         }
 
+        this.scrollArea = this.root.querySelector(
+            ".guide-scroll-area"
+        );
+
+        this.channelColumn = this.root.querySelector(
+            ".guide-channels"
+        );
+
+        this.handleScroll = this.handleScroll.bind(this);
+
+        this.scrollArea?.addEventListener(
+            "scroll",
+            this.handleScroll
+        );
+
         this.rows = Array.from(
             this.root.querySelectorAll(".guide-row")
         );
@@ -40,6 +55,10 @@ export class GuidePage extends Page {
         document.removeEventListener(
             "keydown",
             this.handleKeyDown
+        );
+        this.scrollArea?.removeEventListener(
+            "scroll",
+            this.handleScroll
         );
     }
 
@@ -181,20 +200,28 @@ export class GuidePage extends Page {
     }
     updateDetails(eventElement) {
 
-    document.querySelector(
-        "#guide-detail-title"
-    ).textContent =
-        eventElement.dataset.title;
+        document.querySelector(
+            "#guide-detail-title"
+        ).textContent =
+            eventElement.dataset.title;
 
-    document.querySelector(
-        "#guide-detail-time"
-    ).textContent =
-        `${eventElement.dataset.start} - ${eventElement.dataset.stop}`;
+        document.querySelector(
+            "#guide-detail-time"
+        ).textContent =
+            `${eventElement.dataset.start} - ${eventElement.dataset.stop}`;
 
-    document.querySelector(
-        "#guide-detail-description"
-    ).textContent =
-        eventElement.dataset.description;
+        document.querySelector(
+            "#guide-detail-description"
+        ).textContent =
+            eventElement.dataset.description;
 
-}
+    }
+    handleScroll() {
+        if (!this.scrollArea || !this.channelColumn) {
+            return;
+        }
+
+        this.channelColumn.scrollTop =
+            this.scrollArea.scrollTop;
+    }
 }

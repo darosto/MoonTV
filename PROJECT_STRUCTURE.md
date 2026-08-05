@@ -1,4 +1,4 @@
-# MoonTV – Projektstruktur
+# tvh-quick-gui – Projektstruktur
 
 ## Root
 

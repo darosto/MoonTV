@@ -2,18 +2,12 @@
   <img src="docs/images/logo.png" width="180">
 </p>
 
-<h1 align="center">MoonTV</h1>
+<h1 align="center">tvh-quick-gui</h1>
 
 <p align="center">
 Modern TVHeadend frontend inspired by webOS<br>
 built with FastAPI.
-</p># MoonTV
-
-# 🌕 TV
-
-> Modern TVHeadend frontend inspired by webOS, built with FastAPI.
-
----
+</p>
 
 ## Features
 
