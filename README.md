@@ -108,7 +108,7 @@ PROJECT_STRUCTURE.md
 
 ## Acknowledgements
 
-MoonTV is developed by darosto.
+MoonTV is developed by ixbuluk.
 
 Architecture discussions, code reviews, debugging assistance,
 and implementation support were created in collaboration

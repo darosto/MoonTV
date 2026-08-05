@@ -1017,6 +1017,7 @@ main{
 }
 
 .guide-event {
+    cursor: pointer;
     display: flex;
     align-items: center;
 
@@ -1053,19 +1054,35 @@ main{
 }
 
 .guide-details-logo {
-    display: flex;
+    display: grid;
+    grid-template-rows: 1fr auto;
     align-items: center;
-    justify-content: center;
+    justify-items: center;
 
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 10px;
+    width: 160px;
+    height: 150px;
+    min-width: 160px;
 
-    color: rgba(255, 255, 255, 0.45);
+    overflow: hidden;
 }
 
-.guide-details-time {
+.guide-detail-logo-image {
+    display: block;
+
+    max-width: 135px;
+    max-height: 90px;
+
+    object-fit: contain;
+}
+
+.guide-detail-time {
+    width: 100%;
+    padding-top: 10px;
+
     color: #49b8ff;
-    font-size: 18px;
+    font-size: 16px;
+    text-align: center;
+    white-space: nowrap;
 }
 
 .guide-details h2 {
@@ -1075,12 +1092,25 @@ main{
 }
 
 .guide-details p {
-    max-width: 900px;
     margin: 0;
 
     color: rgba(255, 255, 255, 0.72);
     font-size: 18px;
     line-height: 1.45;
+}
+
+.guide-details > div:last-child {
+    min-width: 0;
+    overflow: hidden;
+}
+
+#guide-detail-description {
+    overflow: hidden;
+}
+
+.guide-details-content {
+    min-width: 0;
+    overflow: hidden;
 }
 
 .guide-channel {
@@ -1149,5 +1179,27 @@ main{
     outline: 3px solid #49b8ff;
     outline-offset: -3px;
 
-    background: rgba(29, 170, 226, 1);
+    background: rgba(25, 99, 129, 1);
+}
+
+.guide-scroll-area {
+    min-width: 0;
+    min-height: 0;
+
+    overflow-x: auto;
+    overflow-y: auto;
+}
+.guide-scroll-area {
+    min-width: 0;
+    min-height: 0;
+
+    overflow-x: auto;
+    overflow-y: auto;
+
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.guide-scroll-area::-webkit-scrollbar {
+    display: none;
 }

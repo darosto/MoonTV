@@ -1,4 +1,7 @@
 import { Page } from "../core/page.js";
+import {
+    navigationController
+} from "../core/navigation-controller.js";
 
 export class GuidePage extends Page {
     constructor() {
@@ -8,8 +11,11 @@ export class GuidePage extends Page {
         this.rows = [];
         this.selectedChannelIndex = 0;
         this.selectedEventIndex = 0;
+        this.scrollArea = null;
 
         this.handleKeyDown = this.handleKeyDown.bind(this);
+        this.handleClick = this.handleClick.bind(this);
+        this.handleDoubleClick = this.handleDoubleClick.bind(this);
     }
 
     initialize() {
@@ -43,9 +49,21 @@ export class GuidePage extends Page {
             return;
         }
 
+        navigationController.setTarget(this);
+
         document.addEventListener(
             "keydown",
             this.handleKeyDown
+        );
+
+        this.root.addEventListener(
+            "click",
+            this.handleClick
+        );
+
+        this.root.addEventListener(
+            "dblclick",
+            this.handleDoubleClick
         );
 
         this.updateSelection();
@@ -56,39 +74,62 @@ export class GuidePage extends Page {
             "keydown",
             this.handleKeyDown
         );
+
+        this.root?.removeEventListener(
+            "click",
+            this.handleClick
+        );
+
+        this.root?.removeEventListener(
+            "dblclick",
+            this.handleDoubleClick
+        );
+
         this.scrollArea?.removeEventListener(
             "scroll",
             this.handleScroll
         );
+
+        navigationController.clearTarget(this);
     }
 
     handleKeyDown(event) {
-        switch (event.key) {
-            case "ArrowUp":
-                event.preventDefault();
-                this.moveUp();
-                break;
+        const actions = {
+            ArrowUp: () =>
+                navigationController.moveUp(),
 
-            case "ArrowDown":
-                event.preventDefault();
-                this.moveDown();
-                break;
+            ArrowDown: () =>
+                navigationController.moveDown(),
 
-            case "ArrowLeft":
-                event.preventDefault();
-                this.moveLeft();
-                break;
+            ArrowLeft: () =>
+                navigationController.moveLeft(),
 
-            case "ArrowRight":
-                event.preventDefault();
-                this.moveRight();
-                break;
+            ArrowRight: () =>
+                navigationController.moveRight(),
 
-            case "Enter":
-                event.preventDefault();
-                this.activateSelection();
-                break;
+            Enter: () =>
+                navigationController.activate(),
+
+            " ": () =>
+                navigationController.activate(),
+
+            Escape: () =>
+                navigationController.back(),
+
+            Backspace: () =>
+                navigationController.back(),
+        };
+
+        const action = actions[event.key];
+
+        if (!action) {
+            return;
         }
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        action();
     }
 
     moveUp() {
@@ -178,15 +219,11 @@ export class GuidePage extends Page {
 
         selectedEvent.classList.add("selected");
 
-        selectedEvent.scrollIntoView({
-            behavior: "smooth",
-            block: "nearest",
-            inline: "nearest",
-        });
+        this.scrollSelectionIntoView(selectedEvent);
         this.updateDetails(selectedEvent);
     }
 
-    activateSelection() {
+    activate() {
         const selectedEvent = this.getSelectedEvent();
 
         if (!selectedEvent) {
@@ -198,6 +235,11 @@ export class GuidePage extends Page {
             selectedEvent.dataset
         );
     }
+
+    back() {
+        window.location.href = "/";
+    }
+
     updateDetails(eventElement) {
 
         document.querySelector(
@@ -215,6 +257,27 @@ export class GuidePage extends Page {
         ).textContent =
             eventElement.dataset.description;
 
+        const logo = document.querySelector(
+            "#guide-detail-logo"
+        );
+
+        const logoUrl = eventElement.dataset.logo?.trim();
+
+        if (logo) {
+            if (logoUrl) {
+                logo.src = logoUrl;
+                logo.alt = eventElement.dataset.channel
+                    ? `Logo von ${eventElement.dataset.channel}`
+                    : "Senderlogo";
+
+                logo.hidden = false;
+            } else {
+                logo.removeAttribute("src");
+                logo.alt = "";
+                logo.hidden = true;
+            }
+        }
+
     }
     handleScroll() {
         if (!this.scrollArea || !this.channelColumn) {
@@ -223,5 +286,136 @@ export class GuidePage extends Page {
 
         this.channelColumn.scrollTop =
             this.scrollArea.scrollTop;
+    }
+    selectEvent(eventElement) {
+        const row = eventElement.closest(".guide-row");
+
+        if (!row) {
+            return false;
+        }
+
+        const channelIndex = this.rows.indexOf(row);
+
+        if (channelIndex === -1) {
+            return false;
+        }
+
+        const events = Array.from(
+            row.querySelectorAll(".guide-event")
+        );
+
+        const eventIndex = events.indexOf(eventElement);
+
+        if (eventIndex === -1) {
+            return false;
+        }
+
+        const selectionChanged =
+            channelIndex !== this.selectedChannelIndex ||
+            eventIndex !== this.selectedEventIndex;
+
+        this.selectedChannelIndex = channelIndex;
+        this.selectedEventIndex = eventIndex;
+
+        this.updateSelection();
+
+        return selectionChanged;
+    }
+    handleClick(event) {
+        const eventElement = event.target.closest(
+            ".guide-event"
+        );
+
+        if (
+            !eventElement ||
+            !this.root.contains(eventElement)
+        ) {
+            return;
+        }
+
+        const selectionChanged =
+            this.selectEvent(eventElement);
+
+        /*
+         * Erster Klick:
+         * Sendung nur auswählen.
+         *
+         * Klick auf bereits ausgewählte Sendung:
+         * Auswahl aktivieren.
+         */
+        if (!selectionChanged) {
+            navigationController.activate();
+        }
+    }
+    handleDoubleClick(event) {
+        const eventElement = event.target.closest(
+            ".guide-event"
+        );
+
+        if (
+            !eventElement ||
+            !this.root.contains(eventElement)
+        ) {
+            return;
+        }
+
+        event.preventDefault();
+
+        this.selectEvent(eventElement);
+        navigationController.activate();
+    }
+    scrollSelectionIntoView(eventElement) {
+        if (!this.scrollArea || !eventElement) {
+            return;
+        }
+
+        const scrollRect =
+            this.scrollArea.getBoundingClientRect();
+
+        const eventRect =
+            eventElement.getBoundingClientRect();
+
+        const horizontalMargin = 24;
+        const verticalMargin = 8;
+
+        if (
+            eventRect.right >
+            scrollRect.right - horizontalMargin
+        ) {
+            this.scrollArea.scrollLeft +=
+                eventRect.right -
+                scrollRect.right +
+                horizontalMargin;
+        }
+
+        if (
+            eventRect.left <
+            scrollRect.left + horizontalMargin
+        ) {
+            this.scrollArea.scrollLeft -=
+                scrollRect.left -
+                eventRect.left +
+                horizontalMargin;
+        }
+
+        if (
+            eventRect.bottom >
+            scrollRect.bottom - verticalMargin
+        ) {
+            this.scrollArea.scrollTop +=
+                eventRect.bottom -
+                scrollRect.bottom +
+                verticalMargin;
+        }
+
+        if (
+            eventRect.top <
+            scrollRect.top + verticalMargin
+        ) {
+            this.scrollArea.scrollTop -=
+                scrollRect.top -
+                eventRect.top +
+                verticalMargin;
+        }
     }
 }
