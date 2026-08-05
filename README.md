@@ -1,12 +1,11 @@
-<p align="center">
+<!--p align="center">
   <img src="docs/images/logo.png" width="180">
-</p>
+</p-->
 
 <h1 align="center">tvh-quick-gui</h1>
 
 <p align="center">
-Modern TVHeadend frontend inspired by webOS<br>
-built with FastAPI.
+A lightweight, blazing-fast modern Web UI and Player for Tvheadend <br> (FastAPI & Native JS)
 </p>
 
 ## Features
