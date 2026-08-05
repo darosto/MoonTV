@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div id="guide" class="guide">
+    <header class="guide-header">
+
+        <div class="guide-channel-header">
+            Sender
+        </div>
+
+        <div class="guide-timeline-viewport">
+
+            <div class="guide-timeline" style="width: {{ guide_width }}px;">
+                {% for slot in time_slots %}
+                <div class="guide-time-slot" style="left: {{ slot.offset }}px;">
+                    {{ slot.label }}
+                </div>
+                {% endfor %}
+            </div>
+
+        </div>
+
+    </header>
+
+    <main class="guide-grid">
+
+        <aside class="guide-channels">
+            {% for channel in channels %}
+            <div class="guide-channel">
+                {% if channel.icon %}
+                <img src="{{ channel.icon }}" alt="{{ channel.name }}" class="guide-channel-logo">
+                {% else %}
+                <span>{{ channel.name }}</span>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </aside>
+
+        <section class="guide-programs">
+
+            <div class="guide-now-line" style="left: {{ now_offset }}px;">
+                <span class="guide-now-label">
+                    {{ now_label }}
+                </span>
+            </div>
+
+            {% for channel in channels %}
+            <div class="guide-row">
+                {% for event in channel.events %}
+                <div class="guide-event" data-title="{{ event.title }}" data-start="{{ event.start_label }}"
+                    data-stop="{{ event.stop_label }}" data-description="{{ event.description }}"
+                    data-channel="{{ channel.name }}" style="width: {{ event.width }}px;">
+                    <div class="guide-event-title">
+                        {{ event.title }}
+                    </div>
+
+                    <div class="guide-event-time">
+                        {{ event.start_label }}
+                        –
+                        {{ event.stop_label }}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endfor %}
+
+        </section>
+
+    </main>
+
+    <div class="guide-details">
+
+        <div class="guide-details-logo">
+            LOGO
+        </div>
+
+        <div>
+
+            <div id="guide-detail-time" class="guide-details-time">
+            </div>
+
+            <h2 id="guide-detail-title"></h2>
+
+            <p id="guide-detail-description"></p>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

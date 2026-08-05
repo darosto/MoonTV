@@ -965,12 +965,10 @@ main{
     grid-template-columns: 190px minmax(0, 1fr);
 
     min-height: 0;
-    overflow: hidden;
 }
 
 .guide-channels {
     background: rgba(11, 39, 58, 0.92);
-    min-height: 0;
 }
 
 .guide-channel,
@@ -994,7 +992,7 @@ main{
     position: relative;
 
     min-width: 0;
-    min-height: 0;
+    overflow: hidden;
 
     background:
         repeating-linear-gradient(
@@ -1039,8 +1037,6 @@ main{
 }
 
 .guide-details {
-    position: static;
-
     display: grid;
     grid-template-columns: 160px minmax(0, 1fr);
     gap: 26px;
@@ -1048,7 +1044,8 @@ main{
     padding: 24px 32px;
 
     border-top: 1px solid rgba(255, 255, 255, 0.14);
-    background: #051018;
+
+    background: rgba(5, 16, 24, 0.96);
 }
 
 .guide-details-logo {
@@ -1140,13 +1137,4 @@ main{
     content: "";
 
     transform: translateX(-50%);
-}
-.guide-event.selected {
-    position: relative;
-    z-index: 5;
-
-    outline: 3px solid #49b8ff;
-    outline-offset: -3px;
-
-    background: rgba(29, 170, 226, 1);
 }
