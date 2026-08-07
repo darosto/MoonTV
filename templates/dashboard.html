@@ -16,6 +16,7 @@
                 {% set row = 0 %}
                 {% set col = 1 %}
                 {% set action = "/tv" %}
+                {% set disabled = false %}
                 {% include "components/card.html" %}
 
                 {% set title = "Recordings" %}
@@ -23,6 +24,7 @@
                 {% set row = 0 %}
                 {% set col = 2 %}
                 {% set action = "/recordings" %}
+                {% set disabled = true %}
                 {% include "components/card.html" %}
 
                 {% set title = "TV Guide" %}
@@ -30,6 +32,7 @@
                 {% set row = 1 %}
                 {% set col = 1 %}
                 {% set action = "/guide" %}
+                {% set disabled = false %}
                 {% include "components/card.html" %}
 
                 {% set title = "Settings" %}
@@ -37,6 +40,7 @@
                 {% set row = 1 %}
                 {% set col = 2 %}
                 {% set action = "/settings" %}
+                {% set disabled = true %}
                 {% include "components/card.html" %}
 
             </div>

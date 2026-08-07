@@ -85,6 +85,10 @@ export class DashboardPage extends Page {
             return;
         }
 
+        if (item.dataset.disabled === "true") {
+            return;
+        }
+
         const action = item.dataset.action;
 
         if (action) {

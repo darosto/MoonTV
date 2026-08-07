@@ -11,36 +11,42 @@ templates = Jinja2Templates(directory="templates")
 async def dashboard(request: Request):
 
     menu = [
-       {
-           "title": "TV",
-           "icon": "📺",
-           "active": True,
-           "action": "/tv",
-       },
-       {
-           "title": "Recordings",
-           "icon": "🎬",
-           "active": False,
-           "action": "/recordings",
-       },
-       {
-           "title": "Settings",
-           "icon": "⚙",
-           "active": False,
-           "action": "/settings",
-       },
-       {
-           "title": "Help",
-           "icon": "❓",
-           "active": False,
-           "action": "/help",
-       },
-       {
-           "title": "Contact",
-           "icon": "✉",
-           "active": False,
-           "action": "/contact",
-       },
+        {
+            "title": "Live TV",
+            "icon": "📺",
+            "action": "/tv",
+            "disabled": False,
+        },
+        {
+            "title": "TV Guide",
+            "icon": "📖",
+            "action": "/guide",
+            "disabled": False,
+        },
+        {
+            "title": "Recordings",
+            "icon": "⏺",
+            "action": "/recordings",
+            "disabled": True,
+        },
+        {
+            "title": "Settings",
+            "icon": "⚙",
+            "action": "/settings",
+            "disabled": True,
+        },
+        {
+            "title": "Help",
+            "icon": "?",
+            "action": "/help",
+            "disabled": True,
+        },
+        {
+            "title": "Contact",
+            "icon": "✉",
+            "action": "/contact",
+            "disabled": True,
+        },
     ]
     return templates.TemplateResponse(
        request=request,

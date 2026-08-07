@@ -24,11 +24,9 @@ body {
 body {
     overflow: hidden;
     background:
-        radial-gradient(
-            circle at 70% 10%,
+        radial-gradient(circle at 70% 10%,
             rgba(255, 255, 255, 0.08),
-            transparent 35%
-        ),
+            transparent 35%),
         var(--background);
 
     color: var(--text);
@@ -39,11 +37,11 @@ button {
     font: inherit;
 }
 
-.layout{
+.layout {
 
-    display:flex;
+    display: flex;
     width: 100vw;
-    height:100vh;
+    height: 100vh;
 
 }
 
@@ -94,9 +92,9 @@ button {
     text-align: center;
 }
 
-.menu-item:hover{
+.menu-item:hover {
 
-    background:#3d3d3d;
+    background: #3d3d3d;
 
 }
 
@@ -105,17 +103,15 @@ button {
     font-weight: 500;
 }
 
-.active{
+.active {
 
-    background:#505050;
+    background: #505050;
 
 }
 
-main{
+main {
 
-    flex:1;
-
-    padding:40px;
+    flex: 1;
 
 }
 
@@ -165,11 +161,9 @@ main{
 
     border-radius: var(--radius-large);
     background:
-        linear-gradient(
-            145deg,
+        linear-gradient(145deg,
             rgba(255, 255, 255, 0.08),
-            rgba(255, 255, 255, 0.015)
-        ),
+            rgba(255, 255, 255, 0.015)),
         var(--surface);
 
     cursor: pointer;
@@ -179,6 +173,11 @@ main{
         background-color 160ms ease,
         color 160ms ease,
         box-shadow 160ms ease;
+}
+
+.card.disabled {
+    opacity: .45;
+    cursor: default;
 }
 
 .card-title {
@@ -241,10 +240,8 @@ main{
     inset: 0;
     pointer-events: none;
     background:
-        linear-gradient(
-            rgba(0, 0, 0, 0.08),
-            rgba(0, 0, 0, 0.08)
-        ),
+        linear-gradient(rgba(0, 0, 0, 0.08),
+            rgba(0, 0, 0, 0.08)),
         url("/static/img/background.png") center center / cover no-repeat;
 
     z-index: 1;
@@ -268,13 +265,11 @@ main{
     overflow: hidden;
 
     background:
-        linear-gradient(
-            to bottom,
+        linear-gradient(to bottom,
             rgba(11, 39, 58, 0.72) 0%,
             rgba(35, 64, 84, 0.91) 20%,
             rgba(35, 64, 84, 0.91) 80%,
-            rgba(11, 39, 58, 0.72) 100%
-        );
+            rgba(11, 39, 58, 0.72) 100%);
 }
 
 .channel-list-track {
@@ -527,6 +522,7 @@ main{
 .player-status[hidden] {
     display: none;
 }
+
 .channel-list {
     transition:
         transform 0.35s ease,
@@ -537,6 +533,7 @@ main{
     transform: translateX(-100%);
     opacity: 0;
 }
+
 .channel-info-panel {
     position: absolute;
     top: 0;
@@ -626,12 +623,10 @@ main{
     margin-bottom: 18px;
 
     background:
-        linear-gradient(
-            90deg,
+        linear-gradient(90deg,
             transparent,
             rgba(255, 255, 255, 0.9),
-            transparent
-        );
+            transparent);
 }
 
 .channel-info-event-list {
@@ -742,11 +737,9 @@ main{
     border-radius: 20px;
 
     background:
-        linear-gradient(
-            135deg,
+        linear-gradient(135deg,
             rgba(15, 21, 29, 0.86),
-            rgba(23, 31, 42, 0.76)
-        );
+            rgba(23, 31, 42, 0.76));
 
     box-shadow:
         0 18px 50px rgba(0, 0, 0, 0.42),
@@ -961,7 +954,7 @@ main{
 }
 
 .guide-grid {
-    
+
     display: grid;
     grid-template-columns: 190px minmax(0, 1fr);
 
@@ -974,16 +967,15 @@ main{
     min-height: 0;
     overflow: hidden;
 }
-
-.guide-channel,
 .guide-row {
     height: 84px;
 }
 
 .guide-channel {
+    justify-content: center;
     display: flex;
     align-items: center;
-
+    height: 84px;
     padding: 0 22px;
 
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
@@ -994,18 +986,16 @@ main{
 
 .guide-programs {
     position: relative;
-
+    z-index: 1;
     min-width: 0;
     min-height: 0;
 
     background:
-        repeating-linear-gradient(
-            to right,
+        repeating-linear-gradient(to right,
             transparent 0,
             transparent 179px,
             rgba(255, 255, 255, 0.08) 179px,
-            rgba(255, 255, 255, 0.08) 180px
-        );
+            rgba(255, 255, 255, 0.08) 180px);
 }
 
 .guide-row {
@@ -1100,7 +1090,7 @@ main{
     line-height: 1.45;
 }
 
-.guide-details > div:last-child {
+.guide-details>div:last-child {
     min-width: 0;
     overflow: hidden;
 }
@@ -1112,10 +1102,6 @@ main{
 .guide-details-content {
     min-width: 0;
     overflow: hidden;
-}
-
-.guide-channel {
-    justify-content: center;
 }
 
 .guide-channel-logo {
@@ -1140,8 +1126,8 @@ main{
 
 .guide-now-label {
     position: absolute;
-    top: -40px;
-    left: 50%;
+    top: 60%;
+    z-index: 20;
 
     padding: 6px 10px;
 
@@ -1154,7 +1140,7 @@ main{
     font-weight: 700;
     white-space: nowrap;
 
-    transform: translateX(-50%);
+    transform: translate(calc(-50% + 1px), -50%);
 }
 
 .guide-now-label::after {
@@ -1173,6 +1159,7 @@ main{
 
     transform: translateX(-50%);
 }
+
 .guide-event.selected {
     position: relative;
     z-index: 5;
@@ -1189,13 +1176,6 @@ main{
 
     overflow-x: auto;
     overflow-y: auto;
-}
-.guide-scroll-area {
-    min-width: 0;
-    min-height: 0;
-
-    overflow-x: auto;
-    overflow-y: auto;
 
     scrollbar-width: none;
     -ms-overflow-style: none;
@@ -1203,4 +1183,9 @@ main{
 
 .guide-scroll-area::-webkit-scrollbar {
     display: none;
+}
+
+.menu-item.disabled {
+    opacity: 0.4;
+    cursor: default;
 }
