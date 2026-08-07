@@ -8,6 +8,7 @@ import httpx
 from dotenv import load_dotenv
 from models.epg_event import EPGEvent
 from models.channel import Channel
+from services.tvheadend_auth import get_tvh_auth
 
 
 load_dotenv()
@@ -16,8 +17,7 @@ load_dotenv()
 class TVHeadendChannelService:
     def __init__(self) -> None:
         self.base_url = os.environ["TVH_URL"].rstrip("/")
-        self.username = os.environ["TVH_USERNAME"]
-        self.password = os.environ["TVH_PASSWORD"]
+        self.auth = get_tvh_auth()
 
         self.timeout = httpx.Timeout(10.0)
         self._cache: list[Channel] = []
@@ -33,7 +33,7 @@ class TVHeadendChannelService:
 
         async with httpx.AsyncClient(
             base_url=self.base_url,
-            auth=(self.username, self.password),
+            auth=self.auth,
             timeout=self.timeout,
         ) as client:
             channel_response = await client.get(
@@ -175,7 +175,7 @@ class TVHeadendChannelService:
 
         async with httpx.AsyncClient(
             base_url=self.base_url,
-            auth=(self.username, self.password),
+            auth=self.auth,
             timeout=self.timeout,
         ) as client:
             response = await client.get(

@@ -7,7 +7,7 @@ from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import HTMLResponse, JSONResponse, Response, StreamingResponse
 from fastapi.templating import Jinja2Templates
 
-
+from services.tvheadend_auth import get_tvh_auth
 from services.tvheadend_channel_service import (
     TVHeadendChannelService,
 )
@@ -54,12 +54,11 @@ async def tvh_image(image_path: str):
         raise HTTPException(status_code=404)
 
     base_url = os.environ["TVH_URL"].rstrip("/")
-    username = os.environ["TVH_USERNAME"]
-    password = os.environ["TVH_PASSWORD"]
+    auth = get_tvh_auth()
 
     try:
         async with httpx.AsyncClient(
-            auth=(username, password),
+            auth=auth,
             timeout=10.0,
         ) as client:
             response = await client.get(
@@ -91,8 +90,7 @@ async def tvh_stream(channel_uuid: str):
         raise HTTPException(status_code=400, detail="Ungültige Sender-UUID")
 
     base_url = os.environ["TVH_URL"].rstrip("/")
-    username = os.environ["TVH_USERNAME"]
-    password = os.environ["TVH_PASSWORD"]
+    auth = get_tvh_auth()
     profile = os.getenv("TVH_STREAM_PROFILE", "").strip()
 
     params = {}
@@ -101,7 +99,7 @@ async def tvh_stream(channel_uuid: str):
         params["profile"] = profile
 
     client = httpx.AsyncClient(
-        auth=(username, password),
+        auth=auth,
         timeout=httpx.Timeout(
             connect=10.0,
             read=None,

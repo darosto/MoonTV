@@ -6,7 +6,7 @@ from typing import Any
 
 import httpx
 from dotenv import load_dotenv
-
+from services.tvheadend_auth import get_tvh_auth
 
 load_dotenv()
 
@@ -32,8 +32,7 @@ class GuideEvent:
 class TVHeadendEPGService:
     def __init__(self) -> None:
         self.base_url = os.environ["TVH_URL"].rstrip("/")
-        self.username = os.environ["TVH_USERNAME"]
-        self.password = os.environ["TVH_PASSWORD"]
+        self.auth = get_tvh_auth()
 
         self.timeout = httpx.Timeout(
             connect=10.0,
@@ -59,7 +58,7 @@ class TVHeadendEPGService:
 
         async with httpx.AsyncClient(
             base_url=self.base_url,
-            auth=(self.username, self.password),
+            auth=self.auth,
             timeout=self.timeout,
         ) as client:
             response = await client.get(
