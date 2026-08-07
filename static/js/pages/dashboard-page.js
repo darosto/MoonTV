@@ -1,4 +1,7 @@
 import { Page } from "../core/page.js";
+import {
+    navigationController
+} from "../core/navigation-controller.js";
 
 export class DashboardPage extends Page {
     constructor() {
@@ -6,136 +9,184 @@ export class DashboardPage extends Page {
 
         this.items = [];
         this.current = null;
-
-        this.handleKeyDown = this.handleKeyDown.bind(this);
-        this.handleFocusIn = this.handleFocusIn.bind(this);
+        this.selectedIndex = 0;
     }
 
     initialize() {
         this.items = Array.from(
             document.querySelectorAll(".focusable")
-        ).filter((item) => !item.disabled);
+        );
+
+        this.items.forEach((item, index) => {
+            item.addEventListener("click", () => {
+                this.selectedIndex = index;
+                this.updateSelection();
+
+                const action = item.dataset.action;
+
+                if (action) {
+                    window.location.href = action;
+                }
+            });
+        });
 
         if (this.items.length === 0) {
             return;
         }
 
-        document.addEventListener("keydown", this.handleKeyDown);
-        document.addEventListener("focusin", this.handleFocusIn);
+        navigationController.setTarget(this);
 
-        const initialItem =
-            this.items.find((item) =>
-                item.classList.contains("active")
-            ) ?? this.items[0];
+        const focusedIndex = this.items.findIndex(
+            (item) =>
+                item.classList.contains("selected")
+        );
 
-        this.setFocus(initialItem);
+        if (focusedIndex >= 0) {
+            this.selectedIndex = focusedIndex;
+        }
+
+        this.updateSelection();
     }
 
     destroy() {
-        document.removeEventListener(
-            "keydown",
-            this.handleKeyDown
-        );
-
-        document.removeEventListener(
-            "focusin",
-            this.handleFocusIn
-        );
+        navigationController.clearTarget(this);
     }
 
-    handleFocusIn(event) {
-        const item = event.target.closest(".focusable");
+    moveLeft() {
+        this.selectedIndex = Math.max(
+            0,
+            this.selectedIndex - 1
+        );
 
-        if (item && this.items.includes(item)) {
-            this.setFocus(item);
+        this.updateSelection();
+    }
+
+    moveRight() {
+        this.selectedIndex = Math.min(
+            this.items.length - 1,
+            this.selectedIndex + 1
+        );
+
+        this.updateSelection();
+    }
+
+    moveUp() {
+        this.moveLeft();
+    }
+
+    moveDown() {
+        this.moveRight();
+    }
+
+    activate() {
+        const item = this.items[this.selectedIndex];
+
+        if (!item) {
+            return;
         }
+
+        const action = item.dataset.action;
+
+        if (action) {
+            window.location.href = action;
+            return;
+        }
+
+        item.click();
     }
 
-    handleKeyDown(event) {
-        const directions = {
-            ArrowLeft: "left",
-            ArrowRight: "right",
-            ArrowUp: "up",
-            ArrowDown: "down",
-        };
+    back() {
+        // Auf dem Dashboard gibt es keine vorherige Seite.
+    }
+    updateSelection() {
+        this.items.forEach(
+            (item, index) => {
+                const selected =
+                    index === this.selectedIndex;
 
-        const direction = directions[event.key];
+                item.classList.toggle(
+                    "focused",
+                    selected
+                );
 
-        if (direction) {
-            event.preventDefault();
-
-            const next = this.findNext(direction);
-
-            if (next) {
-                this.setFocus(next);
+                item.tabIndex =
+                    selected ? 0 : -1;
             }
+        );
 
-            return;
-        }
+        const selectedItem =
+            this.items[this.selectedIndex];
 
-        if (event.key === "Enter" || event.key === " ") {
-            event.preventDefault();
-            this.activateCurrent();
-        }
-    }
-
-    setFocus(element) {
-        if (!element || element === this.current) {
-            return;
-        }
-
-        this.items.forEach((item) => {
-            item.classList.remove("focused");
-            item.tabIndex = -1;
+        selectedItem?.focus({
+            preventScroll: true,
         });
-
-        this.current = element;
-        this.current.classList.add("focused");
-        this.current.tabIndex = 0;
-        this.current.focus({ preventScroll: true });
+    }
+    moveLeft() {
+        this.move("left");
     }
 
-    getPosition(element) {
-        return {
-            row: Number(element.dataset.focusRow),
-            col: Number(element.dataset.focusCol),
-        };
+    moveRight() {
+        this.move("right");
     }
 
-    findNext(direction) {
-        if (!this.current) {
-            return null;
+    moveUp() {
+        this.move("up");
+    }
+
+    moveDown() {
+        this.move("down");
+    }
+    move(direction) {
+        const current =
+            this.items[this.selectedIndex];
+
+        if (!current) {
+            return;
         }
 
-        const current = this.getPosition(this.current);
+        const currentRow =
+            Number(current.dataset.focusRow);
+
+        const currentCol =
+            Number(current.dataset.focusCol);
 
         const candidates = this.items
-            .filter((item) => item !== this.current)
-            .map((item) => {
-                const position = this.getPosition(item);
+            .map((item, index) => {
+                if (index === this.selectedIndex) {
+                    return null;
+                }
+
+                const row =
+                    Number(item.dataset.focusRow);
+
+                const col =
+                    Number(item.dataset.focusCol);
 
                 return {
-                    element: item,
-                    row: position.row,
-                    col: position.col,
-                    rowDistance: Math.abs(
-                        position.row - current.row
-                    ),
-                    colDistance: Math.abs(
-                        position.col - current.col
-                    ),
+                    index,
+                    row,
+                    col,
+                    rowDistance:
+                        Math.abs(row - currentRow),
+                    colDistance:
+                        Math.abs(col - currentCol),
                 };
             })
+            .filter(Boolean)
             .filter((candidate) => {
                 switch (direction) {
                     case "left":
-                        return candidate.col < current.col;
+                        return candidate.col < currentCol;
+
                     case "right":
-                        return candidate.col > current.col;
+                        return candidate.col > currentCol;
+
                     case "up":
-                        return candidate.row < current.row;
+                        return candidate.row < currentRow;
+
                     case "down":
-                        return candidate.row > current.row;
+                        return candidate.row > currentRow;
+
                     default:
                         return false;
                 }
@@ -147,35 +198,45 @@ export class DashboardPage extends Page {
                 direction === "right";
 
             if (horizontal) {
-                if (a.rowDistance !== b.rowDistance) {
-                    return a.rowDistance - b.rowDistance;
+                if (
+                    a.rowDistance !==
+                    b.rowDistance
+                ) {
+                    return (
+                        a.rowDistance -
+                        b.rowDistance
+                    );
                 }
 
-                return a.colDistance - b.colDistance;
+                return (
+                    a.colDistance -
+                    b.colDistance
+                );
             }
 
-            if (a.colDistance !== b.colDistance) {
-                return a.colDistance - b.colDistance;
+            if (
+                a.colDistance !==
+                b.colDistance
+            ) {
+                return (
+                    a.colDistance -
+                    b.colDistance
+                );
             }
 
-            return a.rowDistance - b.rowDistance;
+            return (
+                a.rowDistance -
+                b.rowDistance
+            );
         });
 
-        return candidates[0]?.element ?? null;
-    }
+        const next = candidates[0];
 
-    activateCurrent() {
-        if (!this.current) {
+        if (!next) {
             return;
         }
 
-        const action = this.current.dataset.action;
-
-        if (action) {
-            window.location.href = action;
-            return;
-        }
-
-        this.current.click();
+        this.selectedIndex = next.index;
+        this.updateSelection();
     }
 }

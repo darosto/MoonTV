@@ -15,7 +15,6 @@ export class ChannelList extends Widget {
         this.selectedIndex = 0;
         this.rowHeight = 90;
 
-        this.handleKeyDown = this.handleKeyDown.bind(this);
         this.handleWheel = this.handleWheel.bind(this);
         this.handleClick = this.handleClick.bind(this);
         this.handleDoubleClick = this.handleDoubleClick.bind(this);
@@ -105,7 +104,6 @@ export class ChannelList extends Widget {
         this.unsubscribers = [];
     }
 
-
     next() {
         const nextIndex =
             (this.selectedIndex + 1) % this.rows.length;
@@ -146,16 +144,16 @@ export class ChannelList extends Widget {
         }
 
         return {
-        index: this.selectedIndex,
-        number: Number(row.dataset.channelNumber),
-        uuid: row.dataset.channelUuid ?? "",
-        name: row.dataset.channelName ?? "",
-        logo: row.dataset.channelLogo ?? "",
-        streamUrl: row.dataset.streamUrl ?? "",
-        event: row.dataset.channelEvent ?? "",
-        start: Number(row.dataset.channelStart || 0),
-        stop: Number(row.dataset.channelStop || 0),
-        progress: Number(row.dataset.channelProgress || 0),
+            index: this.selectedIndex,
+            number: Number(row.dataset.channelNumber),
+            uuid: row.dataset.channelUuid ?? "",
+            name: row.dataset.channelName ?? "",
+            logo: row.dataset.channelLogo ?? "",
+            streamUrl: row.dataset.streamUrl ?? "",
+            event: row.dataset.channelEvent ?? "",
+            start: Number(row.dataset.channelStart || 0),
+            stop: Number(row.dataset.channelStop || 0),
+            progress: Number(row.dataset.channelProgress || 0),
         };
     }
 
@@ -219,53 +217,6 @@ export class ChannelList extends Widget {
 
         this.track.style.transform =
             `translate3d(0, ${clampedOffset}px, 0)`;
-    }
-
-    handleKeyDown(event) {
-        switch (event.key) {
-            case "ArrowUp":
-            case "PageUp":
-                event.preventDefault();
-                event.stopPropagation();
-                this.previous();
-                break;
-
-            case "ArrowDown":
-            case "PageDown":
-                event.preventDefault();
-                event.stopPropagation();
-                this.next();
-                break;
-
-            case "Enter":
-            case " ":
-                event.preventDefault();
-                event.stopPropagation();
-                this.activateSelected();
-                break;
-
-            case "Escape":
-            case "Backspace":
-                event.preventDefault();
-                event.stopPropagation();
-
-                this.root.dispatchEvent(
-                    new CustomEvent("channelclose", {
-                        bubbles: true,
-                    })
-                );
-                break;
-
-            case "ArrowRight":
-                event.preventDefault();
-                event.stopPropagation();
-
-                eventBus.emit(
-                    Events.CHANNEL_DETAILS_OPEN,
-                    this.getSelectedChannel()
-                );
-                break;
-        }
     }
 
     handleWheel(event) {
@@ -379,7 +330,6 @@ export class ChannelList extends Widget {
         );
     }
 
-
     activateSelected() {
         const channel = this.getSelectedChannel();
 
@@ -396,5 +346,54 @@ export class ChannelList extends Widget {
             eventBus.emit(Events.CHANNEL_LIST_HIDE);
         }, 1200);
 
+    }
+    selectByUuid(channelUuid, options = {}) {
+        if (!channelUuid) {
+            return false;
+        }
+
+        const index = this.rows.findIndex(
+            (row) => row.dataset.channelUuid === channelUuid
+        );
+
+        if (index === -1) {
+            console.warn(
+                "ChannelList: Sender-UUID nicht gefunden:",
+                channelUuid
+            );
+
+            return false;
+        }
+
+        this.select(index, {
+            animate: options.animate ?? false,
+            focus: options.focus ?? false,
+        });
+
+        return true;
+    }
+
+    selectPrevious() {
+        const nextIndex = Math.max(
+            0,
+            this.selectedIndex - 1
+        );
+
+        this.select(nextIndex, {
+            animate: true,
+            focus: true,
+        });
+    }
+
+    selectNext() {
+        const nextIndex = Math.min(
+            this.rows.length - 1,
+            this.selectedIndex + 1
+        );
+
+        this.select(nextIndex, {
+            animate: true,
+            focus: true,
+        });
     }
 }

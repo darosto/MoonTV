@@ -239,16 +239,21 @@ main{
 .tv-background {
     position: absolute;
     inset: 0;
-
-/*    background:
+    pointer-events: none;
+    background:
         linear-gradient(
             rgba(0, 0, 0, 0.08),
             rgba(0, 0, 0, 0.08)
         ),
         url("/static/img/background.png") center center / cover no-repeat;
-*/
-    background: none;
+
     z-index: 1;
+    transition: opacity 0.4s ease;
+}
+
+.tv-background.hidden {
+    opacity: 0;
+    pointer-events: none;
 }
 
 .channel-list {
@@ -498,10 +503,6 @@ main{
 
     background: #000;
     object-fit: contain;
-}
-
-.tv-background {
-    pointer-events: none;
 }
 
 .player-status {

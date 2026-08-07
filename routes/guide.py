@@ -92,6 +92,7 @@ async def guide(request: Request):
                 "icon": service.build_icon_url(
                     event.channel_icon
                 ),
+                "stream_url": f"/tvh-stream/{event.channel_uuid}",
                 "events": [],
             },
         )

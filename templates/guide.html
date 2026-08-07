@@ -46,11 +46,21 @@
                     {% for channel in channels %}
                     <div class="guide-row">
                         {% for event in channel.events %}
-                        <div class="guide-event" style="width: {{ event.width }}px;" data-title="{{ event.title }}"
-                            data-start="{{ event.start_label }}" data-stop="{{ event.stop_label }}"
-                            data-description="{{ event.description }}" data-channel="{{ channel.name }}"
-                            data-logo="{{ channel.icon }}">
-                            {{ event.title }}
+                        <div class="guide-event" 
+                             style="width: {{ event.width }}px;" 
+                             data-title="{{ event.title }}"
+                             data-start="{{ event.start_label }}" 
+                             data-stop="{{ event.stop_label }}"
+                             data-description="{{ event.description }}" 
+                             
+                             data-channel="{{ channel.name }}"
+                             data-channel-uuid="{{ channel.uuid }}"
+                             data-channel-number="{{ channel.number }}"
+                             data-channel-name="{{ channel.name }}"
+                             data-channel-logo="{{ channel.icon }}"
+                             data-stream-url="{{ channel.stream_url }}"
+                             data-logo="{{ channel.icon }}">
+                             {{ event.title }}
                         </div>
                         {% endfor %}
                     </div>

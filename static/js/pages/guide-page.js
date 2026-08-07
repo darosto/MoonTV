@@ -13,7 +13,6 @@ export class GuidePage extends Page {
         this.selectedEventIndex = 0;
         this.scrollArea = null;
 
-        this.handleKeyDown = this.handleKeyDown.bind(this);
         this.handleClick = this.handleClick.bind(this);
         this.handleDoubleClick = this.handleDoubleClick.bind(this);
     }
@@ -51,11 +50,6 @@ export class GuidePage extends Page {
 
         navigationController.setTarget(this);
 
-        document.addEventListener(
-            "keydown",
-            this.handleKeyDown
-        );
-
         this.root.addEventListener(
             "click",
             this.handleClick
@@ -65,15 +59,12 @@ export class GuidePage extends Page {
             "dblclick",
             this.handleDoubleClick
         );
+        this.activatePendingChannel();
 
         this.updateSelection();
     }
 
     destroy() {
-        document.removeEventListener(
-            "keydown",
-            this.handleKeyDown
-        );
 
         this.root?.removeEventListener(
             "click",
@@ -91,45 +82,6 @@ export class GuidePage extends Page {
         );
 
         navigationController.clearTarget(this);
-    }
-
-    handleKeyDown(event) {
-        const actions = {
-            ArrowUp: () =>
-                navigationController.moveUp(),
-
-            ArrowDown: () =>
-                navigationController.moveDown(),
-
-            ArrowLeft: () =>
-                navigationController.moveLeft(),
-
-            ArrowRight: () =>
-                navigationController.moveRight(),
-
-            Enter: () =>
-                navigationController.activate(),
-
-            " ": () =>
-                navigationController.activate(),
-
-            Escape: () =>
-                navigationController.back(),
-
-            Backspace: () =>
-                navigationController.back(),
-        };
-
-        const action = actions[event.key];
-
-        if (!action) {
-            return;
-        }
-
-        event.preventDefault();
-        event.stopPropagation();
-
-        action();
     }
 
     moveUp() {
@@ -230,6 +182,22 @@ export class GuidePage extends Page {
             return;
         }
 
+        const channel = {
+            uuid: selectedEvent.dataset.channelUuid ?? "",
+            number: Number(selectedEvent.dataset.channelNumber),
+            name: selectedEvent.dataset.channelName ?? "",
+            logo: selectedEvent.dataset.channelLogo ?? "",
+            streamUrl: selectedEvent.dataset.streamUrl ?? "",
+            event: selectedEvent.dataset.title ?? "",
+        };
+
+        sessionStorage.setItem(
+            "tvh-quick-gui.pending-channel",
+            JSON.stringify(channel)
+        );
+
+        window.location.assign("/tv");
+
         console.log(
             "Guide-Auswahl aktiviert:",
             selectedEvent.dataset
@@ -237,7 +205,7 @@ export class GuidePage extends Page {
     }
 
     back() {
-        window.location.href = "/";
+        window.location.assign("/");
     }
 
     updateDetails(eventElement) {
@@ -418,4 +386,39 @@ export class GuidePage extends Page {
                 verticalMargin;
         }
     }
+
+    activatePendingChannel() {
+    const storageKey = "tvh-quick-gui.pending-channel";
+    const storedChannel = sessionStorage.getItem(storageKey);
+
+    if (!storedChannel) {
+        return;
+    }
+
+    sessionStorage.removeItem(storageKey);
+
+    try {
+        const channel = JSON.parse(storedChannel);
+
+        if (!channel?.uuid || !channel?.streamUrl) {
+            return;
+        }
+
+        this.currentChannel = channel;
+
+        eventBus.emit(
+            Events.CHANNEL_ACTIVATE,
+            channel
+        );
+
+        eventBus.emit(
+            Events.CHANNEL_LIST_HIDE
+        );
+    } catch (error) {
+        console.error(
+            "Gespeicherter Guide-Sender ist ungültig:",
+            error
+        );
+    }
+}
 }

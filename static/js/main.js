@@ -1,6 +1,7 @@
 import { DashboardPage } from "./pages/dashboard-page.js";
 import { TVPage } from "./pages/tv-page.js";
 import { GuidePage } from "./pages/guide-page.js";
+import { inputController } from "./core/input-controller.js";
 
 class Application {
     constructor() {
@@ -8,6 +9,7 @@ class Application {
     }
 
     start() {
+        inputController.start();
         if (document.querySelector("#channel-list")) {
             this.currentPage = new TVPage();
         } else if (document.querySelector("#guide")) {
@@ -20,6 +22,7 @@ class Application {
     }
 
     stop() {
+        inputController.stop();
         this.currentPage?.destroy();
         this.currentPage = null;
     }

@@ -15,6 +15,8 @@ export class Player extends Widget {
         this.handlePlaying = this.handlePlaying.bind(this);
         this.handleWaiting = this.handleWaiting.bind(this);
         this.handleError = this.handleError.bind(this);
+        this.background =
+    document.querySelector(".tv-background");
     }
 
     initialize() {
@@ -92,11 +94,13 @@ export class Player extends Widget {
         this.video.pause();
         this.video.removeAttribute("src");
         this.video.load();
+        this.background?.classList.remove("hidden");
     }
 
     handlePlaying() {
         this.hideLoading();
         this.hideError();
+        this.background?.classList.add("hidden");
     }
 
     handleWaiting() {
